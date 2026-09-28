@@ -1399,6 +1399,50 @@ function buildOvertimeSheets(out, info) {
 function makeOvertimeWorkbook(out, info) { return buildXlsx(buildOvertimeSheets(out, info)); }
 
 
+/* =====================================================
+   使用紀錄設定
+   把下面 LOG_URL 換成你的 GAS 網頁應用程式網址即可開始記錄；
+   留空字串則完全不記錄，工具照常運作。
+   ===================================================== */
+var LOG_URL = 'https://script.google.com/macros/s/AKfycbwVyHwsmArl_8xTuaYifKU879JrYSU6JkRFtU1M4aXV8aqn9inUGZbXQyMaT_y9GhjR/exec';
+var APP_VERSION = 'v2.1';
+
+var _logged = {};
+function deviceId() {
+  try {
+    var k = 'npr_did', v = localStorage.getItem(k);
+    if (!v) { v = (Date.now().toString(36) + Math.random().toString(36).slice(2, 8)).toUpperCase(); localStorage.setItem(k, v); }
+    return v;
+  } catch (e) { return ''; }
+}
+function browserLabel() {
+  try {
+    var ua = navigator.userAgent, os = 'Other', br = 'Other';
+    if (/Windows/.test(ua)) os = 'Windows'; else if (/Mac OS X/.test(ua)) os = 'macOS';
+    else if (/iPhone|iPad/.test(ua)) os = 'iOS'; else if (/Android/.test(ua)) os = 'Android';
+    if (/Edg\//.test(ua)) br = 'Edge'; else if (/Chrome\//.test(ua)) br = 'Chrome';
+    else if (/Safari\//.test(ua)) br = 'Safari'; else if (/Firefox\//.test(ua)) br = 'Firefox';
+    return os + ' / ' + br;
+  } catch (e) { return ''; }
+}
+/* 只送統計欄位；姓名、員編、時數等人事資料一律不送 */
+function logEvent(ev, info) {
+  try {
+    if (!LOG_URL) return;
+    info = info || {};
+    var key = ev + '|' + (info.u || '') + '|' + (info.m || '');
+    if (_logged[key]) return;
+    _logged[key] = 1;
+    var src = '';
+    try { src = location.host + location.pathname; } catch (e2) { }
+    var p = { e: ev, v: APP_VERSION, d: deviceId(), b: browserLabel(), s: src,
+      u: info.u || '', h: info.h || '', m: info.m || '', n: info.n == null ? '' : info.n };
+    var qs = Object.keys(p).filter(function (k) { return p[k] !== '' && p[k] != null; })
+      .map(function (k) { return k + '=' + encodeURIComponent(p[k]); }).join('&');
+    new Image().src = LOG_URL + (LOG_URL.indexOf('?') >= 0 ? '&' : '?') + qs;
+  } catch (e) { }
+}
+
 /* ---------------- 前端互動 ---------------- */
 var FILES = {
   roster: { label: '夜班獎勵清冊', name: '', text: null, rows: null },
@@ -1467,6 +1511,7 @@ function acceptFiles(list) {
     if (bad.length) msgs.push('讀取失敗：' + bad.join('、'));
     if (msgs.length) showFileErr(msgs.join('；'));
     renderSlots(); refreshNight(); refreshOt();
+logEvent('open');
   }
 }
 function showFileErr(msg) {
@@ -1521,6 +1566,13 @@ $('run').addEventListener('click', function () {
     ST.nightMeta = r.meta;
     ST.night = analyze(r.rows, r.meta, leaves, readOpts());
     renderNight();
+    var f = r.rows[0] || {}, ppl = {};
+    r.rows.forEach(function (x) { ppl[x.員工編號] = 1; });
+    logEvent('night', {
+      u: f.單位 || '', h: f.院區 || '',
+      m: (r.meta.年 && r.meta.月) ? ((r.meta.年 - 1911) + '年' + r.meta.月 + '月') : '',
+      n: Object.keys(ppl).length
+    });
   } catch (err) {
     showFileErr('夜班獎勵比對失敗：' + (err && err.message ? err.message : err));
     $('out').className = 'hide';
@@ -1684,6 +1736,12 @@ function computeOt() {
   $('otN').value = ST.otResult.row.N;
   $('otOut').className = '';
   renderOt();
+  var pm = (p.ot.period || '').match(/(\d{4})-(\d{2})/);
+  logEvent('ot', {
+    u: ($('otUnit').value || '').trim() || (p.ot.people[0] ? p.ot.people[0].單位 : ''),
+    m: pm ? ((+pm[1] - 1911) + '年' + (+pm[2]) + '月') : '',
+    n: ST.otResult.detail.length
+  });
 }
 
 function otRowValues() {
@@ -1780,6 +1838,7 @@ $('otDownload').addEventListener('click', function () {
 });
 
 renderSlots(); refreshNight(); refreshOt();
+logEvent('open');
 
 </script>
 </body>
