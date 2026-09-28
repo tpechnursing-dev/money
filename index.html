@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>夜班獎勵清冊 × 差勤比對系統</title>
+<title>護理人事月報核算系統</title>
 <style>
 :root{
   box-sizing:border-box;
@@ -12,56 +12,73 @@
   --petrol:#1F5E7A; --teal:#17796D; --coral:#EF6B72; --amber:#F4CF64;
   --bg:#f4f6f7; --card:#ffffff; --ink:#16323d; --muted:#61777f; --line:#dbe3e7;
   --head:#1F5E7A; --headink:#ffffff; --hl:#FFF6C9; --hlline:#E3C64A;
-  --ok:#17796D; --warnbg:#FDF4E3; --warnline:#E8C070;
+  --warnbg:#FDF4E3; --warnline:#E8C070; --dangerbg:#FDECEC;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
     --bg:#0e1a20; --card:#152630; --ink:#e6eef1; --muted:#9db0b8; --line:#28414d;
     --head:#123b4d; --headink:#eaf3f6; --hl:#4a4021; --hlline:#8d7a2e;
-    --warnbg:#332a18; --warnline:#7d6630;
+    --warnbg:#332a18; --warnline:#7d6630; --dangerbg:#3a1f21;
   }
 }
 :root[data-theme="dark"]{
   --bg:#0e1a20; --card:#152630; --ink:#e6eef1; --muted:#9db0b8; --line:#28414d;
   --head:#123b4d; --headink:#eaf3f6; --hl:#4a4021; --hlline:#8d7a2e;
-  --warnbg:#332a18; --warnline:#7d6630;
+  --warnbg:#332a18; --warnline:#7d6630; --dangerbg:#3a1f21;
 }
 *,*::before,*::after{box-sizing:inherit}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{
-  margin:0; background:var(--bg); color:var(--ink);
+body{margin:0;background:var(--bg);color:var(--ink);
   font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
-  font-size:15px; line-height:1.6;
-}
+  font-size:15px;line-height:1.6}
 .wrap{max-width:1180px;margin:0 auto;padding:0 16px 56px}
-header.top{background:linear-gradient(135deg,var(--petrol),var(--teal));color:#fff;padding:22px 16px 20px;margin-bottom:20px}
+header.top{background:linear-gradient(135deg,var(--petrol),var(--teal));color:#fff;padding:22px 16px 20px;margin-bottom:18px}
 header.top .inner{max-width:1180px;margin:0 auto}
-header.top h1{margin:0;font-size:1.32rem;letter-spacing:.5px}
-header.top p{margin:6px 0 0;opacity:.88;font-size:.87rem}
+header.top h1{margin:0;font-size:1.3rem;letter-spacing:.5px}
+header.top p{margin:6px 0 0;opacity:.88;font-size:.86rem}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
 .card h2{margin:0 0 4px;font-size:1.02rem;color:var(--petrol);display:flex;align-items:center;gap:8px}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .card h2{color:#7fc4d8}}
-.card h2 .n{background:var(--teal);color:#fff;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.76rem;flex:none}
+.card h2 .n{background:var(--teal);color:#fff;width:22px;height:22px;border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;font-size:.76rem;flex:none}
 .card .sub{margin:0 0 14px;color:var(--muted);font-size:.84rem}
-.drops{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
-.drop{border:2px dashed var(--line);border-radius:10px;padding:18px 14px;text-align:center;cursor:pointer;transition:.15s;background:transparent}
-.drop:hover,.drop.over{border-color:var(--teal);background:rgba(23,121,109,.06)}
-.drop.done{border-style:solid;border-color:var(--teal);background:rgba(23,121,109,.08)}
-.drop .t{font-weight:600;font-size:.95rem}
-.drop .d{color:var(--muted);font-size:.8rem;margin-top:4px;word-break:break-all}
+.dropzone{border:2px dashed var(--line);border-radius:10px;padding:22px 14px;text-align:center;
+  cursor:pointer;transition:.15s;margin-bottom:14px}
+.dropzone:hover,.dropzone.over{border-color:var(--teal);background:rgba(23,121,109,.06)}
+.dropzone .big{font-weight:600}
+.dropzone .small{color:var(--muted);font-size:.82rem;margin-top:4px}
+.slots{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.slot{border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-size:.84rem}
+.slot.on{border-color:var(--teal);background:rgba(23,121,109,.07)}
+.slot .t{font-weight:600;display:flex;align-items:center;gap:6px}
+.slot .t i{width:16px;height:16px;border-radius:50%;background:var(--line);flex:none;
+  display:inline-flex;align-items:center;justify-content:center;font-size:.62rem;font-style:normal;color:#fff}
+.slot.on .t i{background:var(--teal)}
+.slot .f{color:var(--muted);font-size:.78rem;margin-top:3px;word-break:break-all}
+.tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:9px;
+  padding:10px 18px;font-size:.92rem;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s}
+.tab:hover{color:var(--ink)}
+.tab.active{background:var(--petrol);color:#fff;border-color:var(--petrol)}
 .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px 22px;margin-top:6px}
 label.chk{display:flex;gap:9px;align-items:flex-start;font-size:.88rem;cursor:pointer}
 label.chk input{margin:4px 0 0;flex:none;accent-color:var(--teal)}
 label.chk span small{display:block;color:var(--muted);font-size:.78rem;line-height:1.45}
 .field{margin-top:12px;font-size:.88rem}
-.field input[type=text]{width:100%;margin-top:5px;padding:8px 10px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--ink);font-size:.9rem;font-family:inherit}
-.btn{border:0;border-radius:8px;padding:11px 20px;font-size:.94rem;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s}
+.field label{display:block;margin-bottom:4px}
+.field input[type=text]{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:7px;
+  background:var(--bg);color:var(--ink);font-size:.9rem;font-family:inherit}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.grid4 .field{margin-top:0}
+.btn{border:0;border-radius:8px;padding:11px 20px;font-size:.94rem;font-weight:600;cursor:pointer;
+  font-family:inherit;transition:.15s}
 .btn.primary{background:var(--petrol);color:#fff}
 .btn.primary:hover{background:#17495f}
 .btn.go{background:var(--teal);color:#fff}
 .btn.go:hover{background:#12635a}
 .btn:disabled{opacity:.42;cursor:not-allowed}
-.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink);padding:7px 14px;font-size:.84rem;font-weight:500}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink);padding:7px 14px;
+  font-size:.84rem;font-weight:500}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:13px 15px}
@@ -76,82 +93,167 @@ thead th{background:var(--head);color:var(--headink);position:sticky;top:0;font-
 tbody tr:hover{background:rgba(31,94,122,.05)}
 td.num{text-align:center;font-variant-numeric:tabular-nums}
 td.hl{background:var(--hl);font-weight:700;box-shadow:inset 0 0 0 1px var(--hlline)}
+td.danger{background:var(--dangerbg);color:var(--coral);font-weight:700}
 td.wide{white-space:normal;min-width:180px}
 tfoot td{background:rgba(31,94,122,.09);font-weight:700;border-top:2px solid var(--petrol)}
-.warn{background:var(--warnbg);border:1px solid var(--warnline);border-radius:9px;padding:12px 14px;margin-bottom:14px;font-size:.86rem}
+.warn{background:var(--warnbg);border:1px solid var(--warnline);border-radius:9px;padding:12px 14px;
+  margin-bottom:14px;font-size:.86rem}
 .warn ul{margin:6px 0 0;padding-left:20px}
-.err{background:rgba(239,107,114,.12);border:1px solid var(--coral);border-radius:9px;padding:12px 14px;font-size:.88rem;color:var(--coral)}
+.danger{background:var(--dangerbg);border:1px solid var(--coral);border-radius:9px;padding:14px 16px;
+  margin-bottom:14px;font-size:.88rem}
+.danger strong{color:var(--coral)}
+.err{background:rgba(239,107,114,.12);border:1px solid var(--coral);border-radius:9px;padding:12px 14px;
+  font-size:.88rem;color:var(--coral);margin-top:12px}
 details{margin-top:14px}
 summary{cursor:pointer;font-size:.88rem;color:var(--petrol);font-weight:600;padding:6px 0}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) summary{color:#7fc4d8}}
 .legend{font-size:.79rem;color:var(--muted);margin-top:9px;display:flex;gap:16px;flex-wrap:wrap}
-.legend i{display:inline-block;width:13px;height:13px;border-radius:3px;background:var(--hl);box-shadow:inset 0 0 0 1px var(--hlline);vertical-align:-2px;margin-right:5px}
+.legend i{display:inline-block;width:13px;height:13px;border-radius:3px;background:var(--hl);
+  box-shadow:inset 0 0 0 1px var(--hlline);vertical-align:-2px;margin-right:5px}
 .hide{display:none}
 .rules{font-size:.83rem;color:var(--muted);margin:10px 0 0;padding-left:20px}
 .rules li{margin-bottom:3px}
+.people{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:6px 14px;margin-top:10px}
+.people label{display:flex;gap:8px;align-items:center;font-size:.86rem;cursor:pointer;
+  padding:5px 8px;border-radius:7px}
+.people label:hover{background:rgba(31,94,122,.06)}
+.people label.guess{background:var(--warnbg)}
+.people input{accent-color:var(--teal);flex:none}
+.people .role{color:var(--muted);font-size:.78rem}
+.copybox{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.8rem;overflow-x:auto;
+  white-space:pre;margin-top:10px}
 footer{text-align:center;color:var(--muted);font-size:.78rem;padding:10px 0 4px}
 </style>
 </head>
 <body>
 <header class="top"><div class="inner">
-  <h1>夜班獎勵清冊 × 差勤比對系統</h1>
-  <p>上傳衛福部津貼清冊與單位差勤匯出檔，自動核算請假／公出扣減並產出可簽核的 Excel</p>
+  <h1>護理人事月報核算系統</h1>
+  <p>夜班獎勵清冊比對 ・ 各單位加班時數調查　｜　資料全在本機運算，不會上傳</p>
 </div></header>
 
 <div class="wrap">
 
   <div class="card">
-    <h2><span class="n">1</span>上傳兩個檔案</h2>
-    <p class="sub">直接拖曳或點選；系統會自動辨識哪個是清冊、哪個是差勤，不必在意順序。</p>
-    <div class="drops">
-      <div class="drop" id="dropA"><div class="t">① 衛福部津貼清冊</div><div class="d" id="nameA">夜班獎勵人員清冊匯出檔（.xls）</div></div>
-      <div class="drop" id="dropB"><div class="t">② 單位差勤匯出檔</div><div class="d" id="nameB">單位差假查詢匯出檔（.xls）</div></div>
+    <h2><span class="n">1</span>上傳檔案</h2>
+    <p class="sub">一次拖多個也可以，系統會自動辨識每個檔是什麼，不必在意順序。兩個功能共用同一批檔案。</p>
+    <div class="dropzone" id="dz">
+      <div class="big">把差勤系統匯出的檔案拖到這裡，或點一下選擇</div>
+      <div class="small">支援 .xls／.htm，可多選</div>
     </div>
     <input type="file" id="picker" class="hide" accept=".xls,.xlsx,.htm,.html" multiple>
+    <div class="slots" id="slots"></div>
     <div id="fileErr" class="hide"></div>
   </div>
 
-  <div class="card">
-    <h2><span class="n">2</span>核算規則</h2>
-    <p class="sub">預設值已對齊你 115年9月 的人工版本，可依當期需要調整。</p>
-    <div class="opts">
-      <label class="chk"><input type="checkbox" id="optApproved" checked><span>只採計「核准」的假單<small>非核准狀態一律略過</small></span></label>
-      <label class="chk"><input type="checkbox" id="optOutside" checked><span>不可請領假別即使不在排班明細也扣除<small>關閉後只會扣清冊明細內的日期</small></span></label>
-      <label class="chk"><input type="checkbox" id="optScore" checked><span>預計發給金額套用評核分數<small>金額＝全日上班次數 × 單價 × 評核分數/100</small></span></label>
-      <label class="chk"><input type="checkbox" id="optNight" checked><span>統計區班次一律採調整後次數<small>關閉則夜班改採原排班日數</small></span></label>
+  <div class="tabs">
+    <button class="tab active" data-tab="night">夜班獎勵清冊比對</button>
+    <button class="tab" data-tab="ot">各單位加班時數調查</button>
+  </div>
+
+  <div id="panel-night">
+    <div class="card">
+      <h2><span class="n">2</span>核算規則</h2>
+      <p class="sub">需要「夜班獎勵清冊」＋「差假查詢」兩個檔。</p>
+      <div class="opts">
+        <label class="chk"><input type="checkbox" id="optApproved" checked><span>只採計「核准」的假單<small>非核准狀態一律略過</small></span></label>
+        <label class="chk"><input type="checkbox" id="optOutside" checked><span>不可請領假別即使不在排班明細也扣除<small>關閉後只會扣清冊明細內的日期</small></span></label>
+        <label class="chk"><input type="checkbox" id="optScore" checked><span>預計發給金額套用評核分數<small>金額＝全日上班次數 × 單價 × 評核分數/100</small></span></label>
+        <label class="chk"><input type="checkbox" id="optNight" checked><span>統計區班次一律採調整後次數<small>關閉則夜班改採原排班日數</small></span></label>
+      </div>
+      <div class="field">
+        <label for="optTypes">不可請領津貼的假別（逗號分隔）</label>
+        <input type="text" id="optTypes" value="公出,公假">
+      </div>
+      <ul class="rules">
+        <li>整日差假：衛福部清冊本來就不會列入排班明細，不重複扣。</li>
+        <li>當日請假超過 4 小時 → 該班以 0 計；0～4 小時（含 4）→ 該班以 0.5 計。</li>
+        <li>同一天多張假單先加總時數再判定；時數以差勤系統申報的「日/時」為準。</li>
+      </ul>
+      <div class="row" style="margin-top:16px">
+        <button class="btn go" id="run" disabled>開始比對</button>
+      </div>
     </div>
-    <div class="field">
-      <label for="optTypes">不可請領津貼的假別（逗號分隔）</label>
-      <input type="text" id="optTypes" value="公出,公假">
-    </div>
-    <ul class="rules">
-      <li>整日差假：衛福部清冊本來就不會列入排班明細，不重複扣。</li>
-      <li>當日請假超過 4 小時 → 該班以 0 計；0～4 小時（含 4）→ 該班以 0.5 計。</li>
-      <li>同一天多張假單先加總時數再判定。</li>
-      <li>時數以差勤系統申報的「日/時」為準（起迄時間含午休，不直接相減）。</li>
-    </ul>
-    <div class="row" style="margin-top:16px">
-      <button class="btn go" id="run" disabled>開始比對</button>
-      <button class="btn ghost" id="reset">清除重來</button>
+
+    <div id="out" class="hide">
+      <div class="card">
+        <h2><span class="n">3</span>比對結果</h2>
+        <div id="warnBox"></div>
+        <div class="stats" id="stats"></div>
+        <div class="tablebox"><table id="mainTable"></table></div>
+        <div class="legend"><span><i></i>黃底＝與清冊原值不同，已依差勤調整</span><span>金額＝全日上班次數 × 單價 × 評核分數/100</span></div>
+        <details>
+          <summary>差假比對明細（每一筆假單怎麼算的）</summary>
+          <div class="tablebox" style="margin-top:10px"><table id="traceTable"></table></div>
+        </details>
+        <div class="row" style="margin-top:18px">
+          <button class="btn primary" id="download">下載 Excel（.xlsx）</button>
+          <span style="font-size:.82rem;color:var(--muted)">含簽核版面、合計列、D／E／N 統計與差假比對明細分頁</span>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div id="out" class="hide">
+  <div id="panel-ot" class="hide">
     <div class="card">
-      <h2><span class="n">3</span>比對結果</h2>
-      <div id="warnBox"></div>
-      <div class="stats" id="stats"></div>
-      <div class="tablebox"><table id="mainTable"></table></div>
-      <div class="legend"><span><i></i>黃底＝與清冊原值不同，已依差勤調整</span><span>金額＝全日上班次數 × 單價 × 評核分數/100</span></div>
+      <h2><span class="n">2</span>計入人員</h2>
+      <p class="sub">需要「單位加班查詢」＋「單位可請假天數查詢」；差假查詢用來算補休耗用與已休天數。</p>
+      <div id="otNeed"></div>
+      <div id="otPeopleBox" class="hide">
+        <div class="danger">
+          <strong>⚠ 本表不含護理長及助理</strong><br>
+          請確認已取消勾選單位管理者（護理長／副護理長）與助理職。預設只勾選護理師，但系統無法判斷誰是管理者。
+          <div style="margin-top:10px">
+            <label class="chk"><input type="checkbox" id="otConfirm"><span>我已確認勾選名單正確，不含管理者與助理</span></label>
+          </div>
+        </div>
+        <div class="row" style="gap:8px">
+          <button class="btn ghost" id="otAllNurse">只勾護理師</button>
+          <button class="btn ghost" id="otNone">全部取消</button>
+          <span style="font-size:.82rem;color:var(--muted)" id="otCount"></span>
+        </div>
+        <div class="people" id="otPeople"></div>
+        <p class="rules" style="list-style:none;padding-left:0;margin-top:10px">
+          黃底＝職稱是用員編字首推測的（B→護理師、N→照服員）；其他字首會標成「未知」，請自行確認身分。
+        </p>
+      </div>
+    </div>
 
-      <details>
-        <summary>差假比對明細（每一筆假單怎麼算的）</summary>
-        <div class="tablebox" style="margin-top:10px"><table id="traceTable"></table></div>
-      </details>
+    <div id="otSettings" class="card hide">
+      <h2><span class="n">3</span>手動欄位</h2>
+      <p class="sub">這幾欄兩個檔裡沒有，請自行填寫。</p>
+      <div class="grid4">
+        <div class="field"><label for="otUnit">單位名稱</label><input type="text" id="otUnit"></div>
+        <div class="field"><label for="otK">K 當月1日在職人數</label><input type="text" id="otK"></div>
+        <div class="field"><label for="otF">F 休假總天數(公務人員)</label><input type="text" id="otF" value="0"></div>
+        <div class="field"><label for="otG">G 已休天數(公務人員)</label><input type="text" id="otG" value="0"></div>
+        <div class="field"><label for="otM">M 當月份單位總產生加班費</label><input type="text" id="otM" placeholder="例 2390"></div>
+        <div class="field"><label for="otN">N 備註</label><input type="text" id="otN"></div>
+      </div>
+      <ul class="rules">
+        <li>K 預設帶入勾選人數；當月有到職／離職請自行修正（檔案裡沒有到離職日）。</li>
+        <li>H／I 把勾選的人全部當成約用人員計算；單位若有公務人員，請自行拆到 F／G。</li>
+        <li>N 預設帶入 OD／OE／ON 的天數，可自行增補。</li>
+      </ul>
+    </div>
 
-      <div class="row" style="margin-top:18px">
-        <button class="btn primary" id="download">下載 Excel（.xlsx）</button>
-        <span style="font-size:.82rem;color:var(--muted)">含簽核版面、合計列、D／E／N 統計與差假比對明細分頁</span>
+    <div id="otOut" class="hide">
+      <div class="card">
+        <h2><span class="n">4</span>填報結果</h2>
+        <div id="otWarn"></div>
+        <div class="stats" id="otStats"></div>
+        <div class="tablebox"><table id="otRowTable"></table></div>
+        <div class="copybox" id="otCopyBox"></div>
+        <div class="row" style="margin-top:12px">
+          <button class="btn primary" id="otCopy" disabled>複製這一列</button>
+          <button class="btn primary" id="otDownload" disabled>下載 Excel（.xlsx）</button>
+          <span style="font-size:.82rem;color:var(--muted)" id="otHint">複製後可直接貼回加班時數調查表</span>
+        </div>
+        <details open>
+          <summary>個人明細</summary>
+          <div class="tablebox" style="margin-top:10px"><table id="otDetailTable"></table></div>
+          <div class="legend"><span><i style="background:var(--dangerbg);box-shadow:inset 0 0 0 1px var(--coral)"></i>紅底＝個人加班 ≥ 40 小時，需護理長逐筆了解原因後改善與建議備查</span></div>
+        </details>
       </div>
     </div>
   </div>
@@ -160,6 +262,234 @@ footer{text-align:center;color:var(--muted);font-size:.78rem;padding:10px 0 4px}
 </div>
 
 <script>
+/* ===========================================================
+   極簡二進位 .xls 讀取器（CFB 容器 + BIFF8 記錄）
+   不依賴外部套件；只取得儲存格的文字內容
+   =========================================================== */
+
+function readXlsBinary(buf) {
+  var u8 = new Uint8Array(buf);
+  var dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+  if (u8.length < 512) throw new Error('檔案太小，不是有效的 .xls');
+  var sig = [0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1];
+  for (var i = 0; i < 8; i++) if (u8[i] !== sig[i]) throw new Error('不是 OLE2 格式的 .xls 檔');
+
+  var secShift = dv.getUint16(30, true), miniShift = dv.getUint16(32, true);
+  var secSize = 1 << secShift, miniSize = 1 << miniShift;
+  var nFat = dv.getUint32(44, true);
+  var dirStart = dv.getUint32(48, true);
+  var miniCutoff = dv.getUint32(56, true) || 4096;
+  var miniFatStart = dv.getUint32(60, true), nMiniFat = dv.getUint32(64, true);
+  var difatStart = dv.getUint32(68, true), nDifat = dv.getUint32(72, true);
+
+  function secOff(n) { return 512 + n * secSize; }
+  function secBytes(n) {
+    var o = secOff(n);
+    if (o + secSize > u8.length) return u8.subarray(Math.min(o, u8.length));
+    return u8.subarray(o, o + secSize);
+  }
+
+  // DIFAT → FAT 扇區清單
+  var fatSectors = [];
+  for (var i = 0; i < Math.min(109, nFat); i++) {
+    var v = dv.getUint32(76 + i * 4, true);
+    if (v === 0xFFFFFFFF) break;
+    fatSectors.push(v);
+  }
+  var next = difatStart, guard = 0;
+  while (next !== 0xFFFFFFFE && next !== 0xFFFFFFFF && fatSectors.length < nFat && guard++ < 4096) {
+    var s = secBytes(next), sdv = new DataView(s.buffer, s.byteOffset, s.byteLength);
+    var cnt = (secSize / 4) - 1;
+    for (var i = 0; i < cnt && fatSectors.length < nFat; i++) {
+      var v2 = sdv.getUint32(i * 4, true);
+      if (v2 !== 0xFFFFFFFF) fatSectors.push(v2);
+    }
+    next = sdv.getUint32(secSize - 4, true);
+  }
+
+  // 組出 FAT
+  var fat = [];
+  fatSectors.forEach(function (fs) {
+    var s = secBytes(fs), sdv = new DataView(s.buffer, s.byteOffset, s.byteLength);
+    for (var i = 0; i * 4 + 4 <= s.length; i++) fat.push(sdv.getUint32(i * 4, true));
+  });
+
+  function chain(start, fatArr) {
+    var out = [], cur = start, g = 0;
+    while (cur !== 0xFFFFFFFE && cur !== 0xFFFFFFFF && cur < fatArr.length && g++ < 100000) {
+      out.push(cur); cur = fatArr[cur];
+    }
+    return out;
+  }
+  function readChain(start, size) {
+    var secs = chain(start, fat), out = new Uint8Array(secs.length * secSize), p = 0;
+    secs.forEach(function (n) { var b = secBytes(n); out.set(b, p); p += secSize; });
+    return size ? out.subarray(0, Math.min(size, p)) : out.subarray(0, p);
+  }
+
+  // 目錄
+  var dirBytes = readChain(dirStart, 0);
+  var entries = [];
+  for (var off = 0; off + 128 <= dirBytes.length; off += 128) {
+    var ddv = new DataView(dirBytes.buffer, dirBytes.byteOffset + off, 128);
+    var nameLen = ddv.getUint16(64, true);
+    var name = '';
+    for (var i = 0; i + 1 < nameLen; i += 2) {
+      var c = ddv.getUint16(i, true); if (c) name += String.fromCharCode(c);
+    }
+    entries.push({
+      name: name, type: ddv.getUint8(66),
+      start: ddv.getUint32(116, true), size: ddv.getUint32(120, true)
+    });
+  }
+
+  // 迷你 FAT / 迷你串流
+  var miniFat = [];
+  if (nMiniFat) {
+    var mb = readChain(miniFatStart, 0), mdv = new DataView(mb.buffer, mb.byteOffset, mb.byteLength);
+    for (var i = 0; i * 4 + 4 <= mb.length; i++) miniFat.push(mdv.getUint32(i * 4, true));
+  }
+  var root = entries.filter(function (e) { return e.type === 5; })[0];
+  var miniStream = root && root.size ? readChain(root.start, root.size) : new Uint8Array(0);
+
+  function readStream(e) {
+    if (e.size >= miniCutoff) return readChain(e.start, e.size);
+    var secs = chain(e.start, miniFat), out = new Uint8Array(secs.length * miniSize), p = 0;
+    secs.forEach(function (n) {
+      var o = n * miniSize;
+      out.set(miniStream.subarray(o, o + miniSize), p); p += miniSize;
+    });
+    return out.subarray(0, Math.min(e.size, p));
+  }
+
+  var wbEntry = entries.filter(function (e) {
+    return e.type === 2 && (e.name === 'Workbook' || e.name === 'Book');
+  })[0];
+  if (!wbEntry) throw new Error('.xls 檔裡找不到 Workbook 資料流');
+
+  return parseBiff(readStream(wbEntry));
+}
+
+function parseBiff(data) {
+  var dv = new DataView(data.buffer, data.byteOffset, data.byteLength);
+  var pos = 0, recs = [];
+  while (pos + 4 <= data.length) {
+    var type = dv.getUint16(pos, true), len = dv.getUint16(pos + 2, true);
+    if (pos + 4 + len > data.length) break;
+    recs.push({ type: type, start: pos + 4, len: len });
+    pos += 4 + len;
+  }
+
+  // --- SST（共用字串表）---
+  var sst = [];
+  for (var i = 0; i < recs.length; i++) {
+    if (recs[i].type !== 0x00FC) continue;
+    var blocks = [{ s: recs[i].start, l: recs[i].len }];
+    for (var j = i + 1; j < recs.length && recs[j].type === 0x003C; j++) {
+      blocks.push({ s: recs[j].start, l: recs[j].len });
+    }
+    sst = readSst(dv, blocks);
+    break;
+  }
+
+  // --- 儲存格 ---
+  var cells = {}, maxR = -1, maxC = -1;
+  function put(r, c, v) {
+    if (v == null) return;
+    cells[r + ',' + c] = v;
+    if (r > maxR) maxR = r; if (c > maxC) maxC = c;
+  }
+  recs.forEach(function (r) {
+    var s = r.start;
+    if (r.type === 0x00FD) { // LABELSST
+      var row = dv.getUint16(s, true), col = dv.getUint16(s + 2, true), idx = dv.getUint32(s + 6, true);
+      put(row, col, sst[idx] != null ? sst[idx] : '');
+    } else if (r.type === 0x0204) { // LABEL
+      var row = dv.getUint16(s, true), col = dv.getUint16(s + 2, true);
+      put(row, col, readUniString(dv, s + 6, true).text);
+    } else if (r.type === 0x0203) { // NUMBER
+      put(dv.getUint16(s, true), dv.getUint16(s + 2, true), fmtNum(dv.getFloat64(s + 6, true)));
+    } else if (r.type === 0x027E) { // RK
+      put(dv.getUint16(s, true), dv.getUint16(s + 2, true), fmtNum(rkValue(dv.getUint32(s + 6, true))));
+    } else if (r.type === 0x00BD) { // MULRK
+      var row = dv.getUint16(s, true), c0 = dv.getUint16(s + 2, true), n = (r.len - 6) / 6;
+      for (var k = 0; k < n; k++) put(row, c0 + k, fmtNum(rkValue(dv.getUint32(s + 4 + k * 6 + 2, true))));
+    } else if (r.type === 0x0006) { // FORMULA（只取快取的數值）
+      var row = dv.getUint16(s, true), col = dv.getUint16(s + 2, true);
+      if (dv.getUint16(s + 12, true) !== 0xFFFF) put(row, col, fmtNum(dv.getFloat64(s + 6, true)));
+    }
+  });
+
+  var out = [];
+  for (var r = 0; r <= maxR; r++) {
+    var row = [];
+    for (var c = 0; c <= maxC; c++) row.push(cells[r + ',' + c] != null ? String(cells[r + ',' + c]) : '');
+    out.push(row);
+  }
+  return out;
+}
+
+function fmtNum(n) {
+  if (!isFinite(n)) return '';
+  return Math.abs(n - Math.round(n)) < 1e-9 ? String(Math.round(n)) : String(Math.round(n * 1e6) / 1e6);
+}
+function rkValue(v) {
+  var isInt = v & 2, div = v & 1, num;
+  if (isInt) { num = (v | 0) >> 2; }
+  else {
+    var b = new ArrayBuffer(8), d = new DataView(b);
+    d.setUint32(4, v & 0xFFFFFFFC); num = d.getFloat64(0);
+  }
+  return div ? num / 100 : num;
+}
+function readUniString(dv, off, wideLen) {
+  var cch = wideLen ? dv.getUint16(off, true) : dv.getUint8(off);
+  var p = off + (wideLen ? 2 : 1);
+  var flags = dv.getUint8(p); p++;
+  var high = flags & 1, rich = flags & 8, far = flags & 4;
+  var nRun = 0, cbExt = 0;
+  if (rich) { nRun = dv.getUint16(p, true); p += 2; }
+  if (far) { cbExt = dv.getUint32(p, true); p += 4; }
+  var text = '';
+  for (var i = 0; i < cch; i++) {
+    if (high) { text += String.fromCharCode(dv.getUint16(p, true)); p += 2; }
+    else { text += String.fromCharCode(dv.getUint8(p)); p += 1; }
+  }
+  p += nRun * 4 + cbExt;
+  return { text: text, end: p };
+}
+/* SST 需跨 CONTINUE 記錄；字串可能被切斷，續接時會重出 flags 位元組 */
+function readSst(dv, blocks) {
+  var bi = 0, p = blocks[0].s + 8;
+  function end() { return blocks[bi].s + blocks[bi].l; }
+  function nextBlock() { if (bi + 1 >= blocks.length) return false; bi++; p = blocks[bi].s; return true; }
+  function u8() { if (p >= end() && !nextBlock()) return 0; return dv.getUint8(p++); }
+  function u16() { var a = u8(), b = u8(); return a | (b << 8); }
+  function u32() { return (u16() | (u16() << 16)) >>> 0; }
+
+  var total = dv.getUint32(blocks[0].s, true), unique = dv.getUint32(blocks[0].s + 4, true);
+  var out = [];
+  for (var s = 0; s < unique; s++) {
+    if (p >= end() && !nextBlock()) break;
+    var cch = u16(), flags = u8();
+    var high = flags & 1, rich = flags & 8, far = flags & 4;
+    var nRun = rich ? u16() : 0, cbExt = far ? u32() : 0;
+    var text = '';
+    for (var i = 0; i < cch; i++) {
+      if (p >= end()) {
+        if (!nextBlock()) break;
+        high = dv.getUint8(p++) & 1;   // 續接時重新讀 flags
+      }
+      if (high) { text += String.fromCharCode(dv.getUint16(p, true)); p += 2; }
+      else { text += String.fromCharCode(dv.getUint8(p)); p += 1; }
+    }
+    for (var k = 0; k < nRun * 4 + cbExt; k++) u8();
+    out.push(text);
+  }
+  return out;
+}
+
+
 /* ===========================================================
    夜班獎勵清冊 × 差勤比對  核心邏輯
    =========================================================== */
@@ -507,6 +837,200 @@ function buildNote(notes, month) {
 
 
 /* ===========================================================
+   加班時數調查（各單位加班時數調查表）核心邏輯
+   =========================================================== */
+
+var OT_SHIFTS = ['OD', 'OE', 'ON'];   // 整班加班
+
+function hm(s) {  // "1 時 4分" / "12時0分" → 小時(數值)
+  if (!s) return 0;
+  var m = String(s).replace(/\s/g, '').match(/(\d+(?:\.\d+)?)時(\d+(?:\.\d+)?)分/);
+  if (m) return parseFloat(m[1]) + parseFloat(m[2]) / 60;
+  var n = parseFloat(String(s).replace(/[^0-9.]/g, ''));
+  return isNaN(n) ? 0 : n;
+}
+function dh(s) {  // "5 / 2.5" / "14　/　0" → {d, h}
+  if (!s) return { d: 0, h: 0 };
+  var p = String(s).replace(/[\s\u3000]/g, '').split('/');
+  return { d: parseFloat(p[0]) || 0, h: parseFloat(p[1]) || 0 };
+}
+function hoursText(h) {
+  var sign = h < 0 ? '-' : ''; h = Math.abs(h);
+  var H = Math.floor(h + 1e-9), M = Math.round((h - H) * 60);
+  if (M === 60) { H++; M = 0; }
+  return sign + H + '時' + M + '分';
+}
+function r2(n) { return Math.round(n * 100) / 100; }
+
+/* ---------- 檔二：單位加班查詢 ---------- */
+function parseOvertime(doc) {
+  var trs = Array.prototype.slice.call(doc.querySelectorAll('tr'));
+  var people = [], cur = null, period = '';
+
+  var all = doc.body ? normSpace(doc.body.textContent) : '';
+  var pm = all.match(/(\d{4}-\d{2}-\d{2})\s*[～~]\s*(\d{4}-\d{2}-\d{2})/);
+  if (pm) period = pm[1] + ' ～ ' + pm[2];
+
+  trs.forEach(function (tr) {
+    var cells = rowCells(tr).map(function (c) { return normSpace(c.textContent); });
+    if (!cells.length) return;
+    var c0 = cells[0];
+
+    // 人員標頭：第一格是員編，第二格是含有明細表的容器
+    if (/^[A-Za-z]\d{3,}$/.test(c0) && cells.length >= 2 && /單號/.test(cells[1])) {
+      var head = cells[1].split('單號')[0];
+      var m = head.match(/^(\S+)\s+(\S+)\s+(.+?\([A-Za-z0-9]+\))/);
+      cur = {
+        員工編號: c0,
+        單位: m ? m[1] : '',
+        職稱: m ? m[2] : '',
+        姓名: m ? m[3] : head,
+        records: [], 統計: {}
+      };
+      people.push(cur);
+      return;
+    }
+    if (!cur) return;
+    if (c0 === '單號') return;
+
+    // 統計列
+    if (c0 === '統計' && cells[1]) {
+      var t = cells[1];
+      cur.統計 = {
+        總核發: hm((t.match(/總核發時數:([^(]+)/) || [])[1]),
+        已補休: hm((t.match(/已補休時數:([^(]+)/) || [])[1]),
+        總加班費: hm((t.match(/總加班費時數:([^(]+)/) || [])[1]),
+        可補休: hm((t.match(/可補休時數:([^(]+)/) || [])[1])
+      };
+      return;
+    }
+
+    // 明細列
+    if (/^\d{5,}$/.test(c0) && cells.length >= 13) {
+      cur.records.push({
+        單號: c0, 日期: cells[1], 星期: cells[2], 班別: cells[3],
+        申請時數: hm(cells[4]), 核發時數: hm(cells[5]),
+        預計加班費時數: hm(cells[6]), 核發加班費時數: hm(cells[7]),
+        補休已用時數: hm(cells[8]),
+        加班進: cells[9], 加班出: cells[10],
+        加班種類: cells[11], 可補休期限: cells[12], 狀態: cells[13] || ''
+      });
+    }
+  });
+
+  if (!people.length) throw new Error('加班紀錄檔找不到人員資料（需含「單號」「核發時數」等欄位）');
+  return { people: people, period: period };
+}
+
+/* ---------- 檔三：單位可請假天數查詢（二進位 .xls 讀出的列陣列） ---------- */
+function parseLeaveQuota(rows) {
+  var hi = -1, head = null;
+  for (var i = 0; i < rows.length; i++) {
+    if (rows[i].indexOf('員編') >= 0 && rows[i].join('').indexOf('休假剩餘') >= 0) { hi = i; head = rows[i]; break; }
+  }
+  if (hi < 0) throw new Error('可請假天數檔找不到表頭（需含「員編」「休假剩餘」）');
+  function col(name) { for (var i = 0; i < head.length; i++) if (head[i].indexOf(name) >= 0) return i; return -1; }
+  var cE = col('員編'), cN = col('姓名'), cP = col('前年保留'), cL = col('去年保留'),
+    cR = col('休假剩餘'), cC = col('加班補休時數'), cD = col('加班補休最近到期日');
+
+  var out = [];
+  for (var i = hi + 1; i < rows.length; i++) {
+    var r = rows[i];
+    var eid = (r[cE] || '').trim();
+    if (!/^[A-Za-z]\d{3,}$/.test(eid)) continue;
+    out.push({
+      員工編號: eid, 姓名: (r[cN] || '').trim(),
+      前年保留: dh(r[cP]), 去年保留: dh(r[cL]), 休假剩餘: dh(r[cR]),
+      加班補休時數: hm(r[cC]), 補休到期日: (r[cD] || '').trim()
+    });
+  }
+  if (!out.length) throw new Error('可請假天數檔沒有讀到人員資料');
+  return out;
+}
+
+/* ---------- 人員清單：合併三個來源 ---------- */
+function buildRoster(quota, otPeople, leaves) {
+  var title = {};
+  (otPeople || []).forEach(function (p) { if (p.職稱) title[p.員工編號] = p.職稱; });
+  (leaves || []).forEach(function (l) { if (l.職稱 && !title[l.員工編號]) title[l.員工編號] = l.職稱; });
+
+  return quota.map(function (q) {
+    var t = title[q.員工編號] || '', guessed = false, unknown = false;
+    if (!t) {
+      var p = q.員工編號.charAt(0).toUpperCase();
+      if (p === 'B') { t = '護理師'; guessed = true; }
+      else if (p === 'N') { t = '照顧服務員'; guessed = true; }
+      else { t = '未知'; unknown = true; }
+    }
+    return Object.assign({}, q, {
+      職稱: t, 職稱待確認: guessed || unknown, 職稱未知: unknown,
+      selected: (t.indexOf('護理師') >= 0) && !unknown
+    });
+  });
+}
+
+/* ---------- 主計算 ---------- */
+function analyzeOvertime(roster, otPeople, leaves, meta) {
+  var sel = roster.filter(function (r) { return r.selected; });
+  var byEid = {}; (otPeople || []).forEach(function (p) { byEid[p.員工編號] = p; });
+
+  var 核准 = function (r) { return !r.狀態 || /核准/.test(r.狀態); };
+  var detail = sel.map(function (r) {
+    var p = byEid[r.員工編號];
+    var recs = p ? p.records.filter(核准) : [];
+    var 總核發 = recs.reduce(function (a, b) { return a + b.核發時數; }, 0);
+    var otRecs = recs.filter(function (x) { return OT_SHIFTS.indexOf(x.班別) >= 0; });
+    var 整班時數 = otRecs.reduce(function (a, b) { return a + b.核發時數; }, 0);
+    var days = {}; otRecs.forEach(function (x) { days[x.班別 + '|' + x.日期] = x.班別; });
+
+    var lv = (leaves || []).filter(function (x) {
+      return x.員工編號 === r.員工編號 && /核准/.test(x.狀態);
+    });
+    var 補休用 = lv.filter(function (x) { return x.假別 === '加班補休'; })
+      .reduce(function (a, b) { return a + b.申報日 * 8 + b.申報時; }, 0);
+    var 已休 = lv.filter(function (x) { return x.假別 === '休假'; })
+      .reduce(function (a, b) { return a + b.申報日 + b.申報時 / 8; }, 0);
+
+    var 休假總 = r.前年保留.d + r.前年保留.h / 8 + r.去年保留.d + r.去年保留.h / 8
+      + r.休假剩餘.d + r.休假剩餘.h / 8;
+
+    return {
+      員工編號: r.員工編號, 姓名: r.姓名, 職稱: r.職稱, 職稱待確認: r.職稱待確認,
+      總核發: r2(總核發), 整班加班: r2(整班時數), 逾時加班: r2(總核發 - 整班時數),
+      整班明細: days, 加班費時數: r2(recs.reduce(function (a, b) { return a + b.核發加班費時數 || 0; }, 0)),
+      補休餘額: r2(r.加班補休時數), 補休到期日: r.補休到期日,
+      本月耗用補休: r2(補休用), 休假總天數: r2(休假總), 已休天數: r2(已休),
+      超時警示: 總核發 >= 40
+    };
+  });
+
+  var sum = function (k) { return r2(detail.reduce(function (a, b) { return a + b[k]; }, 0)); };
+  var maxH = detail.reduce(function (a, b) { return Math.max(a, b.總核發); }, 0);
+  var topNames = detail.filter(function (d) { return d.總核發 === maxH && maxH > 0; })
+    .map(function (d) { return d.姓名.replace(/\([^)]*\)/, ''); });
+
+  // 備註：含OD*n
+  var typeDays = {};
+  detail.forEach(function (d) {
+    Object.keys(d.整班明細).forEach(function (k) {
+      var t = d.整班明細[k]; typeDays[t] = (typeDays[t] || 0) + 1;
+    });
+  });
+  var note = Object.keys(typeDays).sort().map(function (t) { return '含' + t + '*' + typeDays[t]; }).join('、');
+
+  return {
+    detail: detail,
+    row: {
+      B: sum('整班加班'), C: sum('逾時加班'), D: sum('補休餘額'), E: sum('本月耗用補休'),
+      F: 0, G: 0, H: sum('休假總天數'), I: sum('已休天數'),
+      J: r2(maxH), K: detail.length, L: topNames.join('、'), M: '', N: note
+    },
+    warnings: detail.filter(function (d) { return d.超時警示; }),
+    meta: meta
+  };
+}
+
+/* ===========================================================
    極簡 XLSX 產生器（不依賴外部套件）
    支援：字型 / 填色 / 框線 / 對齊 / 合併儲存格 / 欄寬 / 列高 / 多工作表
    =========================================================== */
@@ -816,82 +1340,155 @@ function makeWorkbook(out, meta) {
 }
 
 
+/* ===========================================================
+   加班時數調查：填報列 + 個人明細
+   =========================================================== */
+var OT_HEAD = ['單位', 'OD、OE、ON加班總時數', '逾時加班總時數', '至月底餘加班補休時數(小時)',
+  '本月耗用掉加班補休時數(小時)', '休假總天數(公務人員)', '已休天數(公務人員)',
+  '休假總天數(約用人員)', '已休天數(約用人員)', '最高加班時數', '當月1日在職人數',
+  '最高加班時數者', '當月份單位總產生加班費', '備註'];
+
+function buildOvertimeSheets(out, info) {
+  var s1 = new Sheet('加班時數調查填報列');
+  s1.cols = [10, 16, 14, 18, 20, 16, 16, 16, 16, 12, 14, 14, 18, 20];
+  s1.height(1, 20);
+  s1.set(1, 1, (info.title || '各單位加班時數調查') , S.TXT_PLAIN);
+  s1.height(2, 34);
+  OT_HEAD.forEach(function (h, i) { s1.set(2, i + 1, h, S.TH); });
+  var r = out.row, vals = [info.unit || '', r.B, r.C, r.D, r.E, r.F, r.G, r.H, r.I, r.J, r.K, r.L, r.M, r.N];
+  s1.height(3, 18);
+  vals.forEach(function (v, i) {
+    var isNum = typeof v === 'number';
+    s1.set(3, i + 1, v, isNum ? S.NUM : S.TXT, isNum ? 'n' : 's');
+  });
+  s1.set(5, 1, '資料期間：' + (info.period || '') + '；計入人員 ' + out.detail.length + ' 人', S.TXT_PLAIN);
+
+  var s2 = new Sheet('個人明細');
+  var h2 = ['員工編號', '姓名', '職稱', '總核發時數', '整班加班(OD/OE/ON)', '逾時加班',
+    '加班補休餘額', '補休最近到期日', '本月耗用補休', '休假總天數', '已休天數', '超過40小時'];
+  s2.cols = [12, 16, 12, 12, 18, 12, 14, 16, 14, 12, 12, 12];
+  s2.height(1, 30);
+  h2.forEach(function (h, i) { s2.set(1, i + 1, h, S.TH2); });
+  out.detail.forEach(function (d, i) {
+    var r2 = i + 2, hl = d.超時警示;
+    s2.set(r2, 1, d.員工編號, S.TXT); s2.set(r2, 2, d.姓名, S.TXT);
+    s2.set(r2, 3, d.職稱 + (d.職稱待確認 ? '(推測)' : ''), S.TXT);
+    s2.set(r2, 4, d.總核發, hl ? S.NUM_HL : S.NUM, 'n');
+    s2.set(r2, 5, d.整班加班, S.NUM, 'n'); s2.set(r2, 6, d.逾時加班, S.NUM, 'n');
+    s2.set(r2, 7, d.補休餘額, S.NUM, 'n'); s2.set(r2, 8, d.補休到期日, S.TXT);
+    s2.set(r2, 9, d.本月耗用補休, S.NUM, 'n'); s2.set(r2, 10, d.休假總天數, S.NUM, 'n');
+    s2.set(r2, 11, d.已休天數, S.NUM, 'n'); s2.set(r2, 12, hl ? '是' : '', hl ? S.TXT_HL : S.TXT);
+  });
+  return [s1, s2];
+}
+
+function makeOvertimeWorkbook(out, info) { return buildXlsx(buildOvertimeSheets(out, info)); }
+
+
 /* ---------------- 前端互動 ---------------- */
-var state = { rosterText: null, leaveText: null, rosterName: '', leaveName: '', out: null, meta: null };
+var FILES = {
+  roster: { label: '夜班獎勵清冊', name: '', text: null, rows: null },
+  leave: { label: '單位差假查詢', name: '', text: null, rows: null },
+  overtime: { label: '單位加班查詢', name: '', text: null, rows: null },
+  quota: { label: '單位可請假天數查詢', name: '', text: null, rows: null }
+};
+var ST = { night: null, nightMeta: null, otRoster: null, otParsed: null, otResult: null };
 
 function $(id) { return document.getElementById(id); }
+function esc2(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function dp() { return new DOMParser(); }
 
-function decode(buf) {
+/* ---- 檔案辨識 ---- */
+function decodeText(buf) {
   var txt = new TextDecoder('utf-8').decode(buf);
   if (txt.indexOf('\uFFFD') >= 0) {
-    try {
-      var alt = new TextDecoder('big5').decode(buf);
-      if (alt.indexOf('\uFFFD') < 0) return alt;
-    } catch (e) { }
+    try { var alt = new TextDecoder('big5').decode(buf); if (alt.indexOf('\uFFFD') < 0) return alt; } catch (e) { }
   }
   return txt;
 }
-
-function classify(text) {
+function isOle2(u8) {
+  var sig = [0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1];
+  if (u8.length < 8) return false;
+  for (var i = 0; i < 8; i++) if (u8[i] !== sig[i]) return false;
+  return true;
+}
+function classifyText(text) {
   if (/排班日期明細/.test(text) && /全日上班次數/.test(text)) return 'roster';
   if (/起迄期間/.test(text) && /假別/.test(text)) return 'leave';
+  if (/核發時數/.test(text) && /補休已用時數/.test(text)) return 'overtime';
+  if (/休假剩餘/.test(text) && /加班補休時數/.test(text)) return 'quota';
   return null;
 }
 
-function showFileErr(msg) {
-  var el = $('fileErr');
-  if (!msg) { el.className = 'hide'; el.innerHTML = ''; return; }
-  el.className = 'err'; el.style.marginTop = '12px'; el.textContent = msg;
-}
-
-function acceptFiles(files) {
+function acceptFiles(list) {
   showFileErr('');
-  var list = Array.prototype.slice.call(files);
-  var pending = list.length;
+  var arr = Array.prototype.slice.call(list), pending = arr.length, unknown = [], bad = [];
   if (!pending) return;
-  var unknown = [];
-  list.forEach(function (f) {
+  arr.forEach(function (f) {
     var fr = new FileReader();
     fr.onload = function () {
-      var text = decode(fr.result);
-      var kind = classify(text);
-      if (kind === 'roster') { state.rosterText = text; state.rosterName = f.name; }
-      else if (kind === 'leave') { state.leaveText = text; state.leaveName = f.name; }
-      else unknown.push(f.name);
-      if (--pending === 0) {
-        if (unknown.length) showFileErr('無法辨識：' + unknown.join('、') + '。請確認是「夜班獎勵人員清冊」或「單位差假查詢」的匯出檔。');
-        refreshDrops();
-      }
+      try {
+        var u8 = new Uint8Array(fr.result);
+        if (isOle2(u8)) {
+          var rows = readXlsBinary(fr.result);
+          var flat = rows.map(function (r) { return r.join(' '); }).join('\n');
+          var k = classifyText(flat);
+          if (k) { FILES[k].rows = rows; FILES[k].text = null; FILES[k].name = f.name; }
+          else unknown.push(f.name);
+        } else {
+          var text = decodeText(fr.result);
+          var k2 = classifyText(text);
+          if (k2) { FILES[k2].text = text; FILES[k2].rows = null; FILES[k2].name = f.name; }
+          else unknown.push(f.name);
+        }
+      } catch (e) { bad.push(f.name + '（' + (e.message || e) + '）'); }
+      if (--pending === 0) finish();
     };
-    fr.onerror = function () { if (--pending === 0) refreshDrops(); };
+    fr.onerror = function () { bad.push(f.name); if (--pending === 0) finish(); };
     fr.readAsArrayBuffer(f);
   });
+  function finish() {
+    var msgs = [];
+    if (unknown.length) msgs.push('無法辨識：' + unknown.join('、'));
+    if (bad.length) msgs.push('讀取失敗：' + bad.join('、'));
+    if (msgs.length) showFileErr(msgs.join('；'));
+    renderSlots(); refreshNight(); refreshOt();
+  }
+}
+function showFileErr(msg) {
+  var el = $('fileErr');
+  if (!msg) { el.className = 'hide'; el.textContent = ''; return; }
+  el.className = 'err'; el.textContent = msg;
+}
+function renderSlots() {
+  $('slots').innerHTML = Object.keys(FILES).map(function (k) {
+    var f = FILES[k], on = !!(f.text || f.rows);
+    return '<div class="slot' + (on ? ' on' : '') + '"><div class="t"><i>' + (on ? '✓' : '') + '</i>' +
+      esc2(f.label) + '</div><div class="f">' + (on ? esc2(f.name) : '尚未上傳') + '</div></div>';
+  }).join('');
 }
 
-function refreshDrops() {
-  $('dropA').className = 'drop' + (state.rosterText ? ' done' : '');
-  $('dropB').className = 'drop' + (state.leaveText ? ' done' : '');
-  $('nameA').textContent = state.rosterText ? '✓ ' + state.rosterName : '夜班獎勵人員清冊匯出檔（.xls）';
-  $('nameB').textContent = state.leaveText ? '✓ ' + state.leaveName : '單位差假查詢匯出檔（.xls）';
-  $('run').disabled = !(state.rosterText && state.leaveText);
-}
-
-['dropA', 'dropB'].forEach(function (id) {
-  var el = $(id);
-  el.addEventListener('click', function () { $('picker').click(); });
-  el.addEventListener('dragover', function (e) { e.preventDefault(); el.classList.add('over'); });
-  el.addEventListener('dragleave', function () { el.classList.remove('over'); });
-  el.addEventListener('drop', function (e) {
-    e.preventDefault(); el.classList.remove('over');
-    acceptFiles(e.dataTransfer.files);
-  });
-});
+var dz = $('dz');
+dz.addEventListener('click', function () { $('picker').click(); });
+dz.addEventListener('dragover', function (e) { e.preventDefault(); dz.classList.add('over'); });
+dz.addEventListener('dragleave', function () { dz.classList.remove('over'); });
+dz.addEventListener('drop', function (e) { e.preventDefault(); dz.classList.remove('over'); acceptFiles(e.dataTransfer.files); });
 $('picker').addEventListener('change', function (e) { acceptFiles(e.target.files); e.target.value = ''; });
 
-$('reset').addEventListener('click', function () {
-  state = { rosterText: null, leaveText: null, rosterName: '', leaveName: '', out: null, meta: null };
-  refreshDrops(); showFileErr(''); $('out').className = 'hide';
+/* ---- 分頁 ---- */
+Array.prototype.slice.call(document.querySelectorAll('.tab')).forEach(function (b) {
+  b.addEventListener('click', function () {
+    Array.prototype.slice.call(document.querySelectorAll('.tab')).forEach(function (x) { x.classList.remove('active'); });
+    b.classList.add('active');
+    $('panel-night').className = b.dataset.tab === 'night' ? '' : 'hide';
+    $('panel-ot').className = b.dataset.tab === 'ot' ? '' : 'hide';
+  });
 });
+
+/* =====================================================
+   功能一：夜班獎勵清冊比對
+   ===================================================== */
+function refreshNight() { $('run').disabled = !(FILES.roster.text && FILES.leave.text); }
 
 function readOpts() {
   return {
@@ -902,42 +1499,38 @@ function readOpts() {
     不可請領假別: $('optTypes').value.split(/[,，、\s]+/).filter(Boolean)
   };
 }
-
 $('run').addEventListener('click', function () {
   showFileErr('');
   try {
-    var dp = new DOMParser();
-    var r = parseRoster(dp.parseFromString(state.rosterText, 'text/html'));
-    var leaves = parseLeave(dp.parseFromString(state.leaveText, 'text/html'));
-    state.meta = r.meta;
-    state.out = analyze(r.rows, r.meta, leaves, readOpts());
-    render();
+    var r = parseRoster(dp().parseFromString(FILES.roster.text, 'text/html'));
+    var leaves = parseLeave(dp().parseFromString(FILES.leave.text, 'text/html'));
+    ST.nightMeta = r.meta;
+    ST.night = analyze(r.rows, r.meta, leaves, readOpts());
+    renderNight();
   } catch (err) {
-    showFileErr('分析失敗：' + (err && err.message ? err.message : err));
+    showFileErr('夜班獎勵比對失敗：' + (err && err.message ? err.message : err));
     $('out').className = 'hide';
   }
 });
-
-['optApproved', 'optOutside', 'optScore', 'optNight'].forEach(function (id) {
-  $(id).addEventListener('change', function () { if (state.out) $('run').click(); });
+['optApproved', 'optOutside', 'optScore', 'optNight', 'optTypes'].forEach(function (id) {
+  $(id).addEventListener('change', function () { if (ST.night) $('run').click(); });
 });
-$('optTypes').addEventListener('change', function () { if (state.out) $('run').click(); });
 
-function money(n) { return n.toLocaleString('en-US'); }
+function money(n) { return Number(n).toLocaleString('en-US'); }
+function td(v) { return '<td>' + esc2(v) + '</td>'; }
+function num(v, cls) { return '<td class="num' + (cls ? ' ' + cls : '') + '">' + esc2(v) + '</td>'; }
+function sumBy(arr, k) { return Math.round(arr.reduce(function (a, b) { return a + (b[k] || 0); }, 0) * 100) / 100; }
 
-function render() {
-  var o = state.out;
+function renderNight() {
+  var o = ST.night;
   $('out').className = '';
-
-  // 警告
   var wb = $('warnBox');
   if (o.warnings.length) {
     wb.className = 'warn';
     wb.innerHTML = '<strong>需要人工確認 ' + o.warnings.length + ' 項</strong><ul>' +
-      o.warnings.map(function (w) { return '<li>' + escapeHtml(w) + '</li>'; }).join('') + '</ul>';
+      o.warnings.map(function (w) { return '<li>' + esc2(w) + '</li>'; }).join('') + '</ul>';
   } else { wb.className = 'hide'; wb.innerHTML = ''; }
 
-  // 統計卡
   var diff = o.總計 - o.原總計;
   var cards = [
     { k: '調整後總計金額', v: money(o.總計) + ' 元', cls: 'good' },
@@ -950,55 +1543,218 @@ function render() {
     return '<div class="stat ' + c.cls + '"><div class="k">' + c.k + '</div><div class="v">' + c.v + '</div></div>';
   }).join('');
 
-  // 主表
-  var head = ['姓名', '員工編號', '班別', '排班日期明細', '排班日數', '次數', '請假>4hr', '請假≤4hr', '全日上班次數', '單價', '評核分數', '預計發給金額', '差勤比對備註'];
+  var head = ['姓名', '員工編號', '班別', '排班日期明細', '排班日數', '次數', '請假>4hr', '請假≤4hr',
+    '全日上班次數', '單價', '評核分數', '預計發給金額', '差勤比對備註'];
   var html = '<thead><tr>' + head.map(function (h) { return '<th>' + h + '</th>'; }).join('') + '</tr></thead><tbody>';
   o.result.forEach(function (d) {
-    html += '<tr>' +
-      td(d.姓名) + td(d.員工編號) + td(d.班別) + '<td class="wide">' + escapeHtml(d.明細原文) + '</td>' +
-      num(d.排班日數) + num(d.次數) +
-      num(d.L, d.changed.L) + num(d.M, d.changed.M) + num(d.N, d.changed.N) +
-      num(d.單價) + num(d.評核分數) + num(money(d.金額), d.changed.金額) +
-      '<td class="wide">' + escapeHtml(d.備註2) + '</td></tr>';
+    html += '<tr>' + td(d.姓名) + td(d.員工編號) + td(d.班別) +
+      '<td class="wide">' + esc2(d.明細原文) + '</td>' +
+      num(d.排班日數) + num(d.次數) + num(d.L, d.changed.L ? 'hl' : '') + num(d.M, d.changed.M ? 'hl' : '') +
+      num(d.N, d.changed.N ? 'hl' : '') + num(d.單價) + num(d.評核分數) +
+      num(money(d.金額), d.changed.金額 ? 'hl' : '') +
+      '<td class="wide">' + esc2(d.備註2) + '</td></tr>';
   });
   html += '</tbody><tfoot><tr><td colspan="4">合計</td>' +
-    num(sumBy(o.result, '排班日數')) + num(sumBy(o.result, '次數')) +
-    num(sumBy(o.result, 'L')) + num(sumBy(o.result, 'M')) + num(sumBy(o.result, 'N')) +
-    '<td></td><td></td>' + num(money(o.總計)) + '<td></td></tr></tfoot>';
+    num(sumBy(o.result, '排班日數')) + num(sumBy(o.result, '次數')) + num(sumBy(o.result, 'L')) +
+    num(sumBy(o.result, 'M')) + num(sumBy(o.result, 'N')) + '<td></td><td></td>' +
+    num(money(o.總計)) + '<td></td></tr></tfoot>';
   $('mainTable').innerHTML = html;
 
-  // 明細表
   var th2 = ['單號', '姓名', '假別', '起迄期間', '日期', '時數', '對應班別', '位置', '扣減班數', '判定說明'];
   var h2 = '<thead><tr>' + th2.map(function (h) { return '<th>' + h + '</th>'; }).join('') + '</tr></thead><tbody>';
   o.trace.forEach(function (t) {
     h2 += '<tr>' + td(t.單號) + td(t.姓名) + td(t.假別) + td(t.起迄) + td(t.日期) + td(t.時數) +
-      td(t.班別) + td(t.位置) + num(t.扣減 ? t.扣減 : '', !!t.扣減) + '<td class="wide">' + escapeHtml(t.說明) + '</td></tr>';
+      td(t.班別) + td(t.位置) + num(t.扣減 ? t.扣減 : '', t.扣減 ? 'hl' : '') +
+      '<td class="wide">' + esc2(t.說明) + '</td></tr>';
   });
-  h2 += '</tbody>';
-  $('traceTable').innerHTML = h2;
-}
-
-function sumBy(arr, k) { return Math.round(arr.reduce(function (a, b) { return a + (b[k] || 0); }, 0) * 100) / 100; }
-function td(v) { return '<td>' + escapeHtml(v) + '</td>'; }
-function num(v, hl) { return '<td class="num' + (hl ? ' hl' : '') + '">' + escapeHtml(v) + '</td>'; }
-function escapeHtml(s) {
-  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  $('traceTable').innerHTML = h2 + '</tbody>';
 }
 
 $('download').addEventListener('click', function () {
-  var bytes = makeWorkbook(state.out, state.meta);
-  var blob = new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-  var y = state.meta.年 ? (state.meta.年 - 1911) : '';
-  var m = state.meta.月 ? (state.meta.月 < 10 ? '0' + state.meta.月 : state.meta.月) : '';
-  var name = (y && m ? y + '' + m : 'output') + '夜班獎勵清冊_差勤比對.xlsx';
-  var a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = name;
-  document.body.appendChild(a); a.click();
-  setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+  var bytes = makeWorkbook(ST.night, ST.nightMeta);
+  var y = ST.nightMeta.年 ? (ST.nightMeta.年 - 1911) : '';
+  var m = ST.nightMeta.月 ? (ST.nightMeta.月 < 10 ? '0' + ST.nightMeta.月 : ST.nightMeta.月) : '';
+  saveBlob(bytes, (y && m ? '' + y + m : 'output') + '夜班獎勵清冊_差勤比對.xlsx');
 });
 
-refreshDrops();
+function saveBlob(bytes, name) {
+  var blob = new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click();
+  setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+}
+
+/* =====================================================
+   功能二：各單位加班時數調查
+   ===================================================== */
+function refreshOt() {
+  var need = [];
+  if (!FILES.overtime.text) need.push('單位加班查詢');
+  if (!FILES.quota.rows) need.push('單位可請假天數查詢');
+  var box = $('otNeed');
+  if (need.length) {
+    box.className = 'warn';
+    box.innerHTML = '還缺這些檔案：<strong>' + need.join('、') + '</strong>';
+    $('otPeopleBox').className = 'hide';
+    $('otSettings').className = 'card hide';
+    $('otOut').className = 'hide';
+    return;
+  }
+  box.className = 'hide'; box.innerHTML = '';
+  try {
+    var ot = parseOvertime(dp().parseFromString(FILES.overtime.text, 'text/html'));
+    var quota = parseLeaveQuota(FILES.quota.rows);
+    var leaves = FILES.leave.text ? parseLeave(dp().parseFromString(FILES.leave.text, 'text/html')) : [];
+    ST.otParsed = { ot: ot, quota: quota, leaves: leaves };
+    ST.otRoster = buildRoster(quota, ot.people, leaves);
+    $('otUnit').value = $('otUnit').value || (ot.people[0] ? ot.people[0].單位 : '');
+    renderPeople();
+    $('otPeopleBox').className = '';
+    $('otSettings').className = 'card';
+    computeOt();
+  } catch (err) {
+    box.className = 'err';
+    box.textContent = '加班統計讀取失敗：' + (err && err.message ? err.message : err);
+  }
+}
+
+function renderPeople() {
+  var r = ST.otRoster;
+  $('otPeople').innerHTML = r.map(function (p, i) {
+    return '<label class="' + (p.職稱待確認 ? 'guess' : '') + '">' +
+      '<input type="checkbox" data-i="' + i + '"' + (p.selected ? ' checked' : '') + '>' +
+      '<span>' + esc2(p.姓名) + ' <span class="role">' + esc2(p.職稱) +
+      (p.職稱待確認 ? '・推測' : '') + '</span></span></label>';
+  }).join('');
+  Array.prototype.slice.call($('otPeople').querySelectorAll('input')).forEach(function (cb) {
+    cb.addEventListener('change', function () {
+      ST.otRoster[+cb.dataset.i].selected = cb.checked;
+      computeOt();
+    });
+  });
+}
+$('otAllNurse').addEventListener('click', function () {
+  ST.otRoster.forEach(function (p) { p.selected = p.職稱.indexOf('護理師') >= 0 && !p.職稱未知; });
+  renderPeople(); computeOt();
+});
+$('otNone').addEventListener('click', function () {
+  ST.otRoster.forEach(function (p) { p.selected = false; });
+  renderPeople(); computeOt();
+});
+$('otConfirm').addEventListener('change', gateOt);
+['otUnit', 'otK', 'otF', 'otG', 'otM', 'otN'].forEach(function (id) {
+  $(id).addEventListener('input', function () { if (ST.otResult) renderOt(); });
+});
+
+function computeOt() {
+  var p = ST.otParsed; if (!p) return;
+  var n = ST.otRoster.filter(function (x) { return x.selected; }).length;
+  $('otCount').textContent = '已勾選 ' + n + ' 人 / 共 ' + ST.otRoster.length + ' 人';
+  if (!n) { $('otOut').className = 'hide'; ST.otResult = null; return; }
+  ST.otResult = analyzeOvertime(ST.otRoster, p.ot.people, p.leaves, { period: p.ot.period });
+  $('otK').value = String(ST.otResult.row.K);
+  $('otN').value = ST.otResult.row.N;
+  $('otOut').className = '';
+  renderOt();
+}
+
+function otRowValues() {
+  var r = ST.otResult.row;
+  var f = parseFloat($('otF').value) || 0, g = parseFloat($('otG').value) || 0;
+  var k = $('otK').value.trim(), m = $('otM').value.trim(), n = $('otN').value.trim();
+  return [$('otUnit').value.trim(), r.B, r.C, r.D, r.E, f, g, r.H, r.I, r.J,
+    k === '' ? r.K : k, r.L, m, n];
+}
+var OT_COLS = ['單位', 'OD、OE、ON加班總時數', '逾時加班總時數', '至月底餘加班補休時數(小時)',
+  '本月耗用掉加班補休時數(小時)', '休假總天數(公務人員)', '已休天數(公務人員)',
+  '休假總天數(約用人員)', '已休天數(約用人員)', '最高加班時數', '當月1日在職人數',
+  '最高加班時數者', '當月份單位總產生加班費', '備註'];
+var OT_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N'];
+
+function renderOt() {
+  var o = ST.otResult, vals = otRowValues();
+
+  var w = $('otWarn');
+  if (o.warnings.length) {
+    w.className = 'warn';
+    w.innerHTML = '<strong>個人加班 ≥ 40 小時，共 ' + o.warnings.length + ' 人</strong>：' +
+      o.warnings.map(function (d) { return esc2(d.姓名) + '（' + d.總核發 + ' 小時）'; }).join('、') +
+      '<br>依表列規定，請單位護理長逐筆了解加班原因後進行改善與建議備查。';
+  } else { w.className = 'hide'; w.innerHTML = ''; }
+
+  var tot = o.detail.reduce(function (a, b) { return a + b.總核發; }, 0);
+  $('otStats').innerHTML = [
+    { k: '計入人數', v: o.detail.length + ' 人' },
+    { k: '加班核發總時數', v: Math.round(tot * 100) / 100 + '（' + hoursText(tot) + '）', cls: 'good' },
+    { k: '資料期間', v: (o.meta.period || '—') }
+  ].map(function (c) {
+    return '<div class="stat ' + (c.cls || '') + '"><div class="k">' + c.k + '</div><div class="v" style="font-size:' +
+      (String(c.v).length > 14 ? '.95rem' : '1.4rem') + '">' + esc2(c.v) + '</div></div>';
+  }).join('');
+
+  $('otRowTable').innerHTML = '<thead><tr>' +
+    OT_COLS.map(function (h, i) { return '<th>' + OT_LETTERS[i] + '　' + h + '</th>'; }).join('') +
+    '</tr></thead><tbody><tr>' + vals.map(function (v) { return num(v); }).join('') + '</tr></tbody>';
+  $('otCopyBox').textContent = vals.join('\t');
+
+  var h = ['員工編號', '姓名', '職稱', '總核發時數', '整班加班', '逾時加班', '加班補休餘額',
+    '補休最近到期日', '本月耗用補休', '休假總天數', '已休天數'];
+  var html = '<thead><tr>' + h.map(function (x) { return '<th>' + x + '</th>'; }).join('') + '</tr></thead><tbody>';
+  o.detail.forEach(function (d) {
+    html += '<tr>' + td(d.員工編號) + td(d.姓名) + td(d.職稱 + (d.職稱待確認 ? '・推測' : '')) +
+      num(d.總核發 + '（' + hoursText(d.總核發) + '）', d.超時警示 ? 'danger' : '') +
+      num(d.整班加班) + num(d.逾時加班) + num(d.補休餘額) + td(d.補休到期日) +
+      num(d.本月耗用補休) + num(d.休假總天數) + num(d.已休天數) + '</tr>';
+  });
+  html += '</tbody><tfoot><tr><td colspan="3">合計</td>' +
+    num(Math.round(tot * 100) / 100) + num(sumBy(o.detail, '整班加班')) + num(sumBy(o.detail, '逾時加班')) +
+    num(sumBy(o.detail, '補休餘額')) + '<td></td>' + num(sumBy(o.detail, '本月耗用補休')) +
+    num(sumBy(o.detail, '休假總天數')) + num(sumBy(o.detail, '已休天數')) + '</tr></tfoot>';
+  $('otDetailTable').innerHTML = html;
+
+  gateOt();
+}
+
+function gateOt() {
+  var ok = !!(ST.otResult && $('otConfirm').checked);
+  $('otCopy').disabled = !ok;
+  $('otDownload').disabled = !ok;
+  $('otHint').textContent = ok ? '複製後可直接貼回加班時數調查表'
+    : '請先在上方勾選「我已確認勾選名單正確」才能複製或下載';
+}
+
+$('otCopy').addEventListener('click', function () {
+  var text = otRowValues().join('\t');
+  var done = function () { $('otCopy').textContent = '已複製 ✓'; setTimeout(function () { $('otCopy').textContent = '複製這一列'; }, 1600); };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done, fallback);
+  } else fallback();
+  function fallback() {
+    var ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) { }
+    ta.remove();
+  }
+});
+
+$('otDownload').addEventListener('click', function () {
+  var vals = otRowValues(), r = ST.otResult.row;
+  var patched = Object.assign({}, r, {
+    F: vals[5], G: vals[6], K: vals[10], M: vals[12], N: vals[13]
+  });
+  var out = Object.assign({}, ST.otResult, { row: patched });
+  var period = ST.otResult.meta.period || '';
+  var pm = period.match(/(\d{4})-(\d{2})/);
+  var tag = pm ? ((+pm[1] - 1911) + pm[2]) : 'output';
+  var bytes = makeOvertimeWorkbook(out, {
+    unit: vals[0], period: period,
+    title: (pm ? (+pm[1] - 1911) + '年' + (+pm[2]) + '月' : '') + '各單位加班時數調查（不含護理長及助理）'
+  });
+  saveBlob(bytes, tag + '加班時數調查.xlsx');
+});
+
+renderSlots(); refreshNight(); refreshOt();
 
 </script>
 </body>
