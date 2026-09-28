@@ -116,6 +116,11 @@ summary{cursor:pointer;font-size:.88rem;color:var(--petrol);font-weight:600;padd
 .people{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:6px 14px;margin-top:10px}
 .people label{display:flex;gap:8px;align-items:center;font-size:.86rem;cursor:pointer;
   padding:5px 8px;border-radius:7px}
+.people label>span.nm{flex:1;min-width:0}
+.people select{border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink);
+  font-size:.76rem;font-family:inherit;padding:2px 4px;flex:none}
+.people select:disabled{opacity:.35}
+.people label.gov{box-shadow:inset 0 0 0 1px var(--petrol)}
 .people label:hover{background:rgba(31,94,122,.06)}
 .people label.guess{background:var(--warnbg)}
 .people input{accent-color:var(--teal);flex:none}
@@ -210,11 +215,13 @@ footer{text-align:center;color:var(--muted);font-size:.78rem;padding:10px 0 4px}
         <div class="row" style="gap:8px">
           <button class="btn ghost" id="otAllNurse">只勾護理師</button>
           <button class="btn ghost" id="otNone">全部取消</button>
+          <button class="btn ghost" id="otAllCon">全部設為約用</button>
           <span style="font-size:.82rem;color:var(--muted)" id="otCount"></span>
         </div>
         <div class="people" id="otPeople"></div>
         <p class="rules" style="list-style:none;padding-left:0;margin-top:10px">
-          黃底＝職稱是用員編字首推測的（B→護理師、N→照服員）；其他字首會標成「未知」，請自行確認身分。
+          黃底＝職稱是用員編字首推測的（B→護理師、N→照服員）；其他字首會標成「未知」，請自行確認身分。<br>
+          右側可把每個人標成「約用」或「公務」，休假總天數／已休天數會自動拆到 H／I（約用）與 F／G（公務）。
         </p>
       </div>
     </div>
@@ -225,14 +232,12 @@ footer{text-align:center;color:var(--muted);font-size:.78rem;padding:10px 0 4px}
       <div class="grid4">
         <div class="field"><label for="otUnit">單位名稱</label><input type="text" id="otUnit"></div>
         <div class="field"><label for="otK">K 當月1日在職人數</label><input type="text" id="otK"></div>
-        <div class="field"><label for="otF">F 休假總天數(公務人員)</label><input type="text" id="otF" value="0"></div>
-        <div class="field"><label for="otG">G 已休天數(公務人員)</label><input type="text" id="otG" value="0"></div>
         <div class="field"><label for="otM">M 當月份單位總產生加班費</label><input type="text" id="otM" placeholder="例 2390"></div>
         <div class="field"><label for="otN">N 備註</label><input type="text" id="otN"></div>
       </div>
       <ul class="rules">
         <li>K 預設帶入勾選人數；當月有到職／離職請自行修正（檔案裡沒有到離職日）。</li>
-        <li>H／I 把勾選的人全部當成約用人員計算；單位若有公務人員，請自行拆到 F／G。</li>
+        <li>F／G／H／I 依名單上標的員額類別自動拆算，不用手填。</li>
         <li>N 預設帶入 OD／OE／ON 的天數，可自行增補。</li>
       </ul>
     </div>
@@ -964,6 +969,7 @@ function buildRoster(quota, otPeople, leaves) {
     }
     return Object.assign({}, q, {
       職稱: t, 職稱待確認: guessed || unknown, 職稱未知: unknown,
+      公務: false,
       selected: (t.indexOf('護理師') >= 0) && !unknown
     });
   });
@@ -1000,11 +1006,17 @@ function analyzeOvertime(roster, otPeople, leaves, meta) {
       整班明細: days, 加班費時數: r2(recs.reduce(function (a, b) { return a + b.核發加班費時數 || 0; }, 0)),
       補休餘額: r2(r.加班補休時數), 補休到期日: r.補休到期日,
       本月耗用補休: r2(補休用), 休假總天數: r2(休假總), 已休天數: r2(已休),
+      公務: !!r.公務, 員額類別: r.公務 ? '公務人員' : '約用人員',
       超時警示: 總核發 >= 40
     };
   });
 
-  var sum = function (k) { return r2(detail.reduce(function (a, b) { return a + b[k]; }, 0)); };
+  var sum = function (k, filt) {
+    return r2(detail.reduce(function (a, b) {
+      return a + ((filt && !filt(b)) ? 0 : b[k]);
+    }, 0));
+  };
+  var isGov = function (d) { return d.公務; }, isCon = function (d) { return !d.公務; };
   var maxH = detail.reduce(function (a, b) { return Math.max(a, b.總核發); }, 0);
   var topNames = detail.filter(function (d) { return d.總核發 === maxH && maxH > 0; })
     .map(function (d) { return d.姓名.replace(/\([^)]*\)/, ''); });
@@ -1022,7 +1034,8 @@ function analyzeOvertime(roster, otPeople, leaves, meta) {
     detail: detail,
     row: {
       B: sum('整班加班'), C: sum('逾時加班'), D: sum('補休餘額'), E: sum('本月耗用補休'),
-      F: 0, G: 0, H: sum('休假總天數'), I: sum('已休天數'),
+      F: sum('休假總天數', isGov), G: sum('已休天數', isGov),
+      H: sum('休假總天數', isCon), I: sum('已休天數', isCon),
       J: r2(maxH), K: detail.length, L: topNames.join('、'), M: '', N: note
     },
     warnings: detail.filter(function (d) { return d.超時警示; }),
@@ -1364,20 +1377,21 @@ function buildOvertimeSheets(out, info) {
   s1.set(5, 1, '資料期間：' + (info.period || '') + '；計入人員 ' + out.detail.length + ' 人', S.TXT_PLAIN);
 
   var s2 = new Sheet('個人明細');
-  var h2 = ['員工編號', '姓名', '職稱', '總核發時數', '整班加班(OD/OE/ON)', '逾時加班',
+  var h2 = ['員工編號', '姓名', '職稱', '員額類別', '總核發時數', '整班加班(OD/OE/ON)', '逾時加班',
     '加班補休餘額', '補休最近到期日', '本月耗用補休', '休假總天數', '已休天數', '超過40小時'];
-  s2.cols = [12, 16, 12, 12, 18, 12, 14, 16, 14, 12, 12, 12];
+  s2.cols = [12, 16, 12, 12, 12, 18, 12, 14, 16, 14, 12, 12, 12];
   s2.height(1, 30);
   h2.forEach(function (h, i) { s2.set(1, i + 1, h, S.TH2); });
   out.detail.forEach(function (d, i) {
     var r2 = i + 2, hl = d.超時警示;
     s2.set(r2, 1, d.員工編號, S.TXT); s2.set(r2, 2, d.姓名, S.TXT);
     s2.set(r2, 3, d.職稱 + (d.職稱待確認 ? '(推測)' : ''), S.TXT);
-    s2.set(r2, 4, d.總核發, hl ? S.NUM_HL : S.NUM, 'n');
-    s2.set(r2, 5, d.整班加班, S.NUM, 'n'); s2.set(r2, 6, d.逾時加班, S.NUM, 'n');
-    s2.set(r2, 7, d.補休餘額, S.NUM, 'n'); s2.set(r2, 8, d.補休到期日, S.TXT);
-    s2.set(r2, 9, d.本月耗用補休, S.NUM, 'n'); s2.set(r2, 10, d.休假總天數, S.NUM, 'n');
-    s2.set(r2, 11, d.已休天數, S.NUM, 'n'); s2.set(r2, 12, hl ? '是' : '', hl ? S.TXT_HL : S.TXT);
+    s2.set(r2, 4, d.員額類別, d.公務 ? S.TXT_HL : S.TXT);
+    s2.set(r2, 5, d.總核發, hl ? S.NUM_HL : S.NUM, 'n');
+    s2.set(r2, 6, d.整班加班, S.NUM, 'n'); s2.set(r2, 7, d.逾時加班, S.NUM, 'n');
+    s2.set(r2, 8, d.補休餘額, S.NUM, 'n'); s2.set(r2, 9, d.補休到期日, S.TXT);
+    s2.set(r2, 10, d.本月耗用補休, S.NUM, 'n'); s2.set(r2, 11, d.休假總天數, S.NUM, 'n');
+    s2.set(r2, 12, d.已休天數, S.NUM, 'n'); s2.set(r2, 13, hl ? '是' : '', hl ? S.TXT_HL : S.TXT);
   });
   return [s1, s2];
 }
@@ -1622,15 +1636,24 @@ function refreshOt() {
 function renderPeople() {
   var r = ST.otRoster;
   $('otPeople').innerHTML = r.map(function (p, i) {
-    return '<label class="' + (p.職稱待確認 ? 'guess' : '') + '">' +
+    return '<label class="' + (p.職稱待確認 ? 'guess ' : '') + (p.selected && p.公務 ? 'gov' : '') + '">' +
       '<input type="checkbox" data-i="' + i + '"' + (p.selected ? ' checked' : '') + '>' +
-      '<span>' + esc2(p.姓名) + ' <span class="role">' + esc2(p.職稱) +
-      (p.職稱待確認 ? '・推測' : '') + '</span></span></label>';
+      '<span class="nm">' + esc2(p.姓名) + ' <span class="role">' + esc2(p.職稱) +
+      (p.職稱待確認 ? '・推測' : '') + '</span></span>' +
+      '<select data-s="' + i + '"' + (p.selected ? '' : ' disabled') + '>' +
+      '<option value="con"' + (p.公務 ? '' : ' selected') + '>約用</option>' +
+      '<option value="gov"' + (p.公務 ? ' selected' : '') + '>公務</option></select></label>';
   }).join('');
   Array.prototype.slice.call($('otPeople').querySelectorAll('input')).forEach(function (cb) {
     cb.addEventListener('change', function () {
       ST.otRoster[+cb.dataset.i].selected = cb.checked;
-      computeOt();
+      renderPeople(); computeOt();
+    });
+  });
+  Array.prototype.slice.call($('otPeople').querySelectorAll('select')).forEach(function (sl) {
+    sl.addEventListener('change', function () {
+      ST.otRoster[+sl.dataset.s].公務 = (sl.value === 'gov');
+      renderPeople(); computeOt();
     });
   });
 }
@@ -1642,8 +1665,12 @@ $('otNone').addEventListener('click', function () {
   ST.otRoster.forEach(function (p) { p.selected = false; });
   renderPeople(); computeOt();
 });
+$('otAllCon').addEventListener('click', function () {
+  ST.otRoster.forEach(function (p) { p.公務 = false; });
+  renderPeople(); computeOt();
+});
 $('otConfirm').addEventListener('change', gateOt);
-['otUnit', 'otK', 'otF', 'otG', 'otM', 'otN'].forEach(function (id) {
+['otUnit', 'otK', 'otM', 'otN'].forEach(function (id) {
   $(id).addEventListener('input', function () { if (ST.otResult) renderOt(); });
 });
 
@@ -1661,9 +1688,8 @@ function computeOt() {
 
 function otRowValues() {
   var r = ST.otResult.row;
-  var f = parseFloat($('otF').value) || 0, g = parseFloat($('otG').value) || 0;
   var k = $('otK').value.trim(), m = $('otM').value.trim(), n = $('otN').value.trim();
-  return [$('otUnit').value.trim(), r.B, r.C, r.D, r.E, f, g, r.H, r.I, r.J,
+  return [$('otUnit').value.trim(), r.B, r.C, r.D, r.E, r.F, r.G, r.H, r.I, r.J,
     k === '' ? r.K : k, r.L, m, n];
 }
 var OT_COLS = ['單位', 'OD、OE、ON加班總時數', '逾時加班總時數', '至月底餘加班補休時數(小時)',
@@ -1698,16 +1724,17 @@ function renderOt() {
     '</tr></thead><tbody><tr>' + vals.map(function (v) { return num(v); }).join('') + '</tr></tbody>';
   $('otCopyBox').textContent = vals.join('\t');
 
-  var h = ['員工編號', '姓名', '職稱', '總核發時數', '整班加班', '逾時加班', '加班補休餘額',
+  var h = ['員工編號', '姓名', '職稱', '員額類別', '總核發時數', '整班加班', '逾時加班', '加班補休餘額',
     '補休最近到期日', '本月耗用補休', '休假總天數', '已休天數'];
   var html = '<thead><tr>' + h.map(function (x) { return '<th>' + x + '</th>'; }).join('') + '</tr></thead><tbody>';
   o.detail.forEach(function (d) {
     html += '<tr>' + td(d.員工編號) + td(d.姓名) + td(d.職稱 + (d.職稱待確認 ? '・推測' : '')) +
+      num(d.員額類別, d.公務 ? 'hl' : '') +
       num(d.總核發 + '（' + hoursText(d.總核發) + '）', d.超時警示 ? 'danger' : '') +
       num(d.整班加班) + num(d.逾時加班) + num(d.補休餘額) + td(d.補休到期日) +
       num(d.本月耗用補休) + num(d.休假總天數) + num(d.已休天數) + '</tr>';
   });
-  html += '</tbody><tfoot><tr><td colspan="3">合計</td>' +
+  html += '</tbody><tfoot><tr><td colspan="4">合計</td>' +
     num(Math.round(tot * 100) / 100) + num(sumBy(o.detail, '整班加班')) + num(sumBy(o.detail, '逾時加班')) +
     num(sumBy(o.detail, '補休餘額')) + '<td></td>' + num(sumBy(o.detail, '本月耗用補休')) +
     num(sumBy(o.detail, '休假總天數')) + num(sumBy(o.detail, '已休天數')) + '</tr></tfoot>';
@@ -1740,9 +1767,7 @@ $('otCopy').addEventListener('click', function () {
 
 $('otDownload').addEventListener('click', function () {
   var vals = otRowValues(), r = ST.otResult.row;
-  var patched = Object.assign({}, r, {
-    F: vals[5], G: vals[6], K: vals[10], M: vals[12], N: vals[13]
-  });
+  var patched = Object.assign({}, r, { K: vals[10], M: vals[12], N: vals[13] });
   var out = Object.assign({}, ST.otResult, { row: patched });
   var period = ST.otResult.meta.period || '';
   var pm = period.match(/(\d{4})-(\d{2})/);
